@@ -79,6 +79,59 @@ patients <- patients %>%
 
 #### Apply Bayes Theorem in Class
 
+B \<- Has Disease
+
+A \<- Positive test result
+
+P(B\|A) - The probability of having the disease given a positive test result
+
+### P(B)
+
+The probability that a person has the disease
+
+```{r}
+patients %>%
+  tabyl(has_disease)
+```
+
+```{r}
+probability_patients_with_disease <- 0.001
+```
+
+### P(A)
+
+The probability that the patient has a positive test result
+
+```{r}
+patients %>%
+  tabyl(test_result)
+```
+
+```{r}
+probability_positive_test_result <- 0.01
+```
+
+#### L(B\|A) = P(A\|B)
+
+Probability has positive test result given patient has the disease
+
+```{r}
+patients %>%
+  tabyl(test_result, has_disease) %>%
+  adorn_percentages("col")
+```
+
+```{r}
+probability_positive_test_result_given_has_disease <- 0.9
+```
+
+### P(B\|A)
+
+```{r}
+(probability_patients_with_disease * probability_positive_test_result_given_has_disease
+/ probability_positive_test_result)
+```
+
 #### Video
 
 ```{r}
@@ -90,3 +143,5 @@ embed_url("https://www.youtube.com/watch?v=R13BD8qKeTg")
 $$
 P(\text{have disease} \mid \text{positive second test}) = \frac{P(\text{have disease after first positive}) \cdot P(\text{positive second test} \mid \text{have disease})}{P(\text{positive second test})}
 $$
+
+After watching the video, I have a better understanding of how to answer about the two positive test results. So first we start with the first positive test, after the first test is positive, it changes the belief the first person has the disease. Then the new probability of the person having the disease after the first positive is now the prior for the second test. Then we would apply Bayes theorem again with the second test. Which is seen in the equation as the probability that a person has the disease given this second positive test result.\
