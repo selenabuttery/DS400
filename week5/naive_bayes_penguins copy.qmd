@@ -1,0 +1,117 @@
+---
+title: "naive bayes penguins"
+format: html
+editor: visual
+---
+
+### Libraries
+
+```{r, message = FALSE}
+library(tidyverse)
+library(bayesrules)
+library(janitor)
+library(e1071)
+```
+
+### Story
+
+We’ll start our naive Bayes classification with just a single penguin. Suppose an Antarctic researcher comes across a penguin that weighs less than 4200g with a 195mm-long flipper and 50mm-long bill. Our goal is to help this researcher identify the species of this penguin, Adelie, Chinstrap, or Gentoo.
+
+#### Let's Plot!
+
+Make a visualization that will help the researcher determine the species based on the characteristics described above
+
+```{r}
+data(penguins_bayes)
+penguins <- penguins_bayes
+```
+
+```{r}
+colnames(penguins)
+```
+
+```{r}
+head(penguins)
+```
+
+The first thing that comes to mind when identifying a species is the creation of a decision tree, but this would require machine learning. So, I must think of a more simple visualization that completes a similar task.
+
+```{r}
+ggplot(data = penguins, aes(x = above_average_weight, fill = species)) +
+  geom_bar() # 0 is no, 1 is yes
+```
+
+```{r}
+ggplot(data = penguins, aes(bill_length_mm, flipper_length_mm, color = body_mass_g)) +
+  geom_point() + 
+  geom_smooth(method = lm) +
+  facet_grid(~species)
+```
+
+Looking at the graph above, we can assume that it is a chinstrap penguin. Now we will check the certainty of this.
+
+```{r}
+penguins <- penguins %>%
+  mutate(above_average_weight = if_else
+(above_average_weight == 1, "yes", "no"))
+```
+
+Our Bayesian strategy
+
+P(B\|A)
+
+-   P(Chinstrap \| below average weight)
+
+```{r}
+penguins %>%
+  tabyl(above_average_weight, species) %>%
+  adorn_percentages("row")
+```
+
+There are more variables that should be considered, so we will look at Naive Bayes
+
+### Naive Bayes Classification
+
+```{r}
+naive_model_hints <- naiveBayes(species ~ flipper_length_mm + bill_length_mm +
+                                  above_average_weight, data = penguins)
+
+# species is what we are looking for, the following variables are what we are considering, and then penguins is the dataset
+```
+
+```{r}
+our_penguin <- data.frame(bill_length_mm = 50, flipper_length_mm = 195, above_average_weight = "no")
+```
+
+### Asking our model to create a prediction of what species our penguin is
+
+```{r}
+predict(naive_model_hints, newdata = our_penguin, type = "raw")
+```
+
+99% chance that it is a Chinstrap penguin
+
+### Testing our model for accuracy with a confusion matrix
+
+```{r}
+penguins <- penguins %>%
+  mutate(predicted_species = predict(naive_model_hints, newdata = .))
+```
+
+This just added a column to the penguins data set recording what species our model predicted
+
+```{r}
+head(penguins)
+```
+
+Now let's check accuracy
+
+```{r}
+penguins %>%
+  tabyl(species, predicted_species) %>%
+  adorn_percentages("row") %>%
+  adorn_pct_formatting(digits = 2) %>%
+  adorn_ns
+```
+
+The model is best at predicting Adelie penguins, worst at predicting Chinstrap penguins
