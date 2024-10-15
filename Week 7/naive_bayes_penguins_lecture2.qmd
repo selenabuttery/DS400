@@ -239,3 +239,50 @@ probs_chinstrap
 ```
 
 ### Find Gentoo
+
+### Species
+
+```{r}
+penguins %>% 
+  tabyl(species)
+```
+
+### Flipper Length
+
+```{r}
+dnorm(195, mean = 217.1870, sd = 6.484976)
+```
+
+### Bill Length
+
+```{r}
+dnorm(50, mean = 47.50488, sd =  3.081857)
+```
+
+### Above Average Weight
+
+```{r}
+penguins %>% 
+  tabyl(species, above_average_weight) %>% 
+  adorn_percentages("row")
+```
+
+P(Gentoo) \* P(Gentoo \| 195 mm flipper) \* P(Gentoo \| 50 mm bill) \* P(under average weight \| Gentoo)
+
+```{r}
+probs_gentoo <- (124/342) * 0.0001767016 * 0.09327439 * .04
+probs_gentoo
+```
+
+### Sum of Probabilities
+
+```{r}
+sum_of_probs <- probs_adelie + probs_chinstrap + probs_gentoo
+sum_of_probs
+```
+
+### Probability Chinstrap
+
+```{r}
+probs_chinstrap / sum_of_probs
+```
