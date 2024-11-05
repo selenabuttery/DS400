@@ -113,11 +113,25 @@ bikes_scooters <- bikes_spring_2012 %>%
 ### Exploratory Data Analysis
 
 ```{r}
+ggplot(data = bikes, aes(x = temp_feel, y = rides)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  stat_cor()
+```
 
+```{r}
+ggplot(data = bikes_scooters, aes(x = temp_actual, y = rides, color = temp_feel)) +
+  geom_point()
 ```
 
 ```{r}
 
+avg_scooter_rides_by_day <- bikes_scooters %>%
+  group_by(day_of_week)
+  summarise(mean_rides = mean(scooter_rides, na.rm = TRUE)
+
+ggplot(data = avg_scooter_rides_by_day, aes(x = day_of_week, y = mean_rides)) +
+  geom_bar(stat = "identity")
 ```
 
 ### Visualizing Together
